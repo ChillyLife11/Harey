@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { useShopStore } from '@/store/shop.ts';
-import ShopList from "@/components/shop/ShopList.vue";
-import ShopDialogAdd from "@/components/shop/ShopDialogAdd.vue";
+import { useCategoryStore }  from '@/store/category.ts';
+import CategoryList      from "@/components/category/CategoryList.vue";
+import CategoryDialogAdd from "@/components/category/CategoryDialogAdd.vue";
 import { reactive, ref } from "vue";
-// import { shops } from "@/data/shops.ts";
-import { IShopItem } from "@/types/shop";
+import { IShopItem }     from "@/types/category.ts";
 
-const shopStore = useShopStore()
+const shopStore = useCategoryStore()
 
 const addDialogOpen = ref<boolean>();
 const selectedShop = reactive<IShopItem>({
@@ -22,12 +21,12 @@ const selectedShop = reactive<IShopItem>({
         Harey
     </div>
     <div class="p-3 py-8">
-        <ShopList
+        <CategoryList
             :items="shopStore.list"
             @open-dialog-add="addDialogOpen = true"
         />
 
-        <ShopDialogAdd
+        <CategoryDialogAdd
             v-if="addDialogOpen"
             v-model="addDialogOpen"
             title="Добавить магазин"

@@ -17,7 +17,6 @@ import {
     FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { IShopItem } from "@/types/shop";
 
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";

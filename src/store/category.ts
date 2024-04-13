@@ -1,23 +1,23 @@
-import { IShopItem } from '@/types/shop';
+import { ICategoryItem } from '@/types/category.ts';
 import { defineStore } from 'pinia';
 
-export const useShopStore = defineStore('shop', {
+export const useCategoryStore = defineStore('category', {
     state: () => ({
         list: [
             {
                 id: 1,
-                name: 'Ninja food',
+                name: 'Кафе',
             },
             {
                 id: 3,
-                name: 'Пятерочка',
+                name: 'Продуктовый магазин',
             },
             {
                 id: 10,
                 name: 'Автобус',
                 default_price: 27
             },
-        ] as IShopItem[]
+        ] as ICategoryItem[]
     }),
     actions: {
         add() {

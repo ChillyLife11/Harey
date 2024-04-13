@@ -1,4 +1,4 @@
-import { IShopItem } from "@/types/shop";
+import { IShopItem } from "@/types/category.ts";
 
 export const shops: IShopItem[] = [
     {
