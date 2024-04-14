@@ -19,7 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
+import * as z            from "zod";
+import { create } from "@/api.ts";
 
 interface IProps {
     title: string | null;
@@ -34,11 +35,11 @@ const formSchema = toTypedSchema(z.object({
         required_error: 'Обязательное поле',
         invalid_type_error: 'Введите корректное значение'
     }).min(2, { message: 'Минимум 2 символа' }).max(100, { message: 'Максимум 100 символов' }),
-    price: z.optional(z.number())
+    default_cost: z.optional(z.number())
 }));
 
 function onSubmit(values: IShopItem) {
-    
+    create('categories', values);
 }
 </script>
 
@@ -58,7 +59,7 @@ function onSubmit(values: IShopItem) {
                         <FormMessage />
                     </FormItem>
                 </FormField>
-                <FormField v-slot="{ componentField }" name="price">
+                <FormField v-slot="{ componentField }" name="default_cost">
                     <FormItem>
                         <FormLabel>Цена по умолчанию</FormLabel>
                         <FormControl>
