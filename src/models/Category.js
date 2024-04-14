@@ -1,4 +1,4 @@
-import { create } from "@/api.ts";
+import { create } from "@/api.js";
 import { DocumentReference } from "firebase/firestore";
 
 export default class Category {

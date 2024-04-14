@@ -1,8 +1,8 @@
 <script setup>
-import { useCategoryStore }  from '@/store/category.ts';
-import CategoryList      from "@/components/category/CategoryList.vue";
-import CategoryDialogAdd from "@/components/category/CategoryDialogAdd.vue";
-import { reactive, ref } from "vue";
+import { useCategoryStore } from '@/store/category.js';
+import CategoryList         from "@/components/category/CategoryList.vue";
+import CategoryDialogAdd    from "@/components/category/CategoryDialogAdd.vue";
+import { reactive, ref }    from "vue";
 
 const shopStore = useCategoryStore()
 
