@@ -1,5 +1,5 @@
 export interface ICategoryItem {
-    id?: number | null,
+    id?: string | null,
     name: string | null,
     default_price?: number
 }

@@ -1,14 +1,12 @@
-<script lang="ts" setup>
+<script setup>
 import CategoryItem      from "@/components/category/CategoryItem.vue";
 import { ICategoryItem } from "@/types/category.ts";
 
-interface IProps {
-    items: ICategoryItem[];
-}
-
 const $emit = defineEmits(["openDialogAdd"]);
 
-const $props = defineProps<IProps>();
+const $props = defineProps({
+    items: Array
+});
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup>
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -17,18 +17,16 @@ import {
     FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import Category from "@/models/Category";
 
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z            from "zod";
-import { create } from "@/api.ts";
 
-interface IProps {
-    title: string | null;
-}
+const $props = defineProps({
+    title: String
+});
 
-const props = defineProps<IProps>();
-
-const open = defineModel<boolean>();
+const open = defineModel();
 
 const formSchema = toTypedSchema(z.object({
     name: z.string({
@@ -38,8 +36,8 @@ const formSchema = toTypedSchema(z.object({
     default_cost: z.optional(z.number())
 }));
 
-function onSubmit(values: IShopItem) {
-    create('categories', values);
+function onSubmit(values) {
+    Category.create(values.name, values.default_cost);
 }
 </script>
 
@@ -47,7 +45,7 @@ function onSubmit(values: IShopItem) {
     <Dialog v-model:open="open">
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>{{ props.title }}</DialogTitle>
+                <DialogTitle>{{ $props.title }}</DialogTitle>
             </DialogHeader>
             <Form :validation-schema="formSchema" @submit="onSubmit" class="flex flex-col space-y-4">
                 <FormField v-slot="{ componentField }" name="name">

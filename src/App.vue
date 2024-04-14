@@ -1,14 +1,13 @@
-<script lang="ts" setup>
+<script setup>
 import { useCategoryStore }  from '@/store/category.ts';
 import CategoryList      from "@/components/category/CategoryList.vue";
 import CategoryDialogAdd from "@/components/category/CategoryDialogAdd.vue";
 import { reactive, ref } from "vue";
-import { IShopItem }     from "@/types/category.ts";
 
 const shopStore = useCategoryStore()
 
-const addDialogOpen = ref<boolean>();
-const selectedShop = reactive<IShopItem>({
+const addDialogOpen = ref();
+const selectedShop = reactive({
     id: null,
     name: null,
 });

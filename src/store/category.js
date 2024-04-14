@@ -17,7 +17,7 @@ export const useCategoryStore = defineStore('category', {
                 name: 'Автобус',
                 default_price: 27
             },
-        ] as ICategoryItem[]
+        ]
     }),
     actions: {
         add() {
