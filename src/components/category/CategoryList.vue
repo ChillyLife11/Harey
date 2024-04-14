@@ -1,5 +1,5 @@
 <script setup>
-import CategoryItem      from "@/components/category/CategoryItem.vue";
+import CategoryItem from "@/components/category/CategoryItem.vue";
 
 const $emit = defineEmits(["openDialogAdd"]);
 

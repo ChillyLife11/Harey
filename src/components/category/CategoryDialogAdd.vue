@@ -1,5 +1,6 @@
 <script setup>
 import { Button } from "@/components/ui/button";
+import { useCategoryStore } from '@/store/category.js';
 import {
     Dialog,
     DialogContent,
@@ -17,7 +18,6 @@ import {
     FormDescription
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Category from "@/models/Category";
 
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z            from "zod";
@@ -28,6 +28,8 @@ const $props = defineProps({
 
 const open = defineModel();
 
+const categoryStore = useCategoryStore();
+
 const formSchema = toTypedSchema(z.object({
     name: z.string({
         required_error: 'Обязательное поле',
@@ -37,7 +39,7 @@ const formSchema = toTypedSchema(z.object({
 }));
 
 function onSubmit(values) {
-    Category.create(values.name, values.default_cost);
+    categoryStore.add(values.name, values.default_cost);
 }
 </script>
 

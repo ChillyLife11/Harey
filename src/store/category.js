@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { create }      from '@/api.js';
 
 export const useCategoryStore = defineStore('category', {
     state: () => ({
@@ -19,11 +20,19 @@ export const useCategoryStore = defineStore('category', {
         ]
     }),
     actions: {
-        add() {
-            this.list.push({
-                id: 111,
-                name: 'Магнит',
-            });
+        getList() {
+
+        },
+        async add(name, default_cost = 0) {
+            try {
+                const id = await create('categories', { name, default_cost, dt: (new Date()) });
+                
+                this.list.push({
+                    id: 111,
+                    name: 'Магнит',
+                });
+            } catch (e) { console.log(e); }
+
         }
     }
 });
