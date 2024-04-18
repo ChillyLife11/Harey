@@ -4,7 +4,9 @@ import CategoryList         from "@/components/category/CategoryList.vue";
 import CategoryDialogAdd    from "@/components/category/CategoryDialogAdd.vue";
 import { reactive, ref }    from "vue";
 
-const shopStore = useCategoryStore()
+const shopStore = useCategoryStore();
+
+shopStore.getList();
 
 const addDialogOpen = ref();
 const selectedShop = reactive({

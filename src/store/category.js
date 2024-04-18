@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { create }      from '@/api.js';
+import { create, readAll }      from '@/api.js';
 
 export const useCategoryStore = defineStore('category', {
     state: () => ({
@@ -20,8 +20,11 @@ export const useCategoryStore = defineStore('category', {
         ]
     }),
     actions: {
-        getList() {
-
+        async getList() {
+            try {
+                let a = await readAll('categories');
+                console.log(a);
+            } catch (e) { console.log(e); }
         },
         async add(name, default_cost = 0) {
             try {
