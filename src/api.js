@@ -11,6 +11,7 @@ export const create = async (table, fields) => {
         console.error(e);
     }
 }
+
 export const readAll = async (table) => {
     const q = query(collection(db, table));
 
@@ -20,6 +21,7 @@ export const readAll = async (table) => {
         return res.length === 0 ? [] : res.docs.map(doc => {
             let { name, default_cost, dt } = doc.data();
             return {
+                id: doc.id,
                 name,
                 default_cost,
                 dt: dt?.seconds ?? null

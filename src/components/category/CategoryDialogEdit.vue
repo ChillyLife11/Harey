@@ -21,10 +21,17 @@ import { Input } from "@/components/ui/input";
 
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z            from "zod";
+import { ref }           from 'vue';
+
+const $props = defineProps({
+    categoryId: String
+})
+
+const categoryStore = useCategoryStore();
 
 const open = defineModel();
 
-const categoryStore = useCategoryStore();
+const currentCategory = ref({...categoryStore.list.find(c => c.id === $props.categoryId())});
 
 const formSchema = toTypedSchema(z.object({
     name: z.string({
@@ -35,7 +42,7 @@ const formSchema = toTypedSchema(z.object({
 }));
 
 function onSubmit(values) {
-    categoryStore.add(values.name, values.default_cost);
+    console.log('submitted')
 }
 </script>
 
@@ -43,9 +50,10 @@ function onSubmit(values) {
     <Dialog v-model:open="open">
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Добавить категорию</DialogTitle>
+                <DialogTitle>Редактировать категорию</DialogTitle>
             </DialogHeader>
             <Form :validation-schema="formSchema" @submit="onSubmit" class="flex flex-col space-y-4">
+                {{ currentCategory }}
                 <FormField v-slot="{ componentField }" name="name">
                     <FormItem>
                         <FormLabel>Название</FormLabel>

@@ -4,9 +4,9 @@ import CategoryList         from "@/components/category/CategoryList.vue";
 import CategoryDialogAdd    from "@/components/category/CategoryDialogAdd.vue";
 import { reactive, ref }    from "vue";
 
-const shopStore = useCategoryStore();
+const categoryStore = useCategoryStore();
 
-shopStore.getList();
+categoryStore.getList();
 
 const addDialogOpen = ref();
 const selectedShop = reactive({
@@ -23,14 +23,15 @@ const selectedShop = reactive({
     </div>
     <div class="p-3 py-8">
         <CategoryList
-            :items="shopStore.list"
+            :items="categoryStore.list"
             @open-dialog-add="addDialogOpen = true"
         />
 
-        <CategoryDialogAdd
-            v-if="addDialogOpen"
-            v-model="addDialogOpen"
-            title="Добавить магазин"
-        />
+<!--        <CategoryDialogAdd-->
+<!--            v-if="addDialogOpen"-->
+<!--            v-model="addDialogOpen"-->
+<!--        />-->
     </div>
+
+    <CoreCommonDialog />
 </template>
