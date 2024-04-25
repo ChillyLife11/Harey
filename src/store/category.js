@@ -17,8 +17,9 @@ export const useCategoryStore = defineStore('category', {
         async add(name, default_cost = 0) {
             try {
                 const id = await create('categories', { name, default_cost, dt: (new Date()) });
-            } catch (e) { console.log(e); }
 
+                this.list.push({ id, name, default_cost });
+            } catch (e) { console.log(e); }
         }
     }
 });

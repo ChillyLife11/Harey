@@ -32,6 +32,4 @@ const selectedShop = reactive({
 <!--            v-model="addDialogOpen"-->
 <!--        />-->
     </div>
-
-    <CoreCommonDialog />
 </template>

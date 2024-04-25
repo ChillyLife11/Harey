@@ -32,10 +32,10 @@ function openDialogEdit(id) {
         />
         <CategoryItem
             icon="asi-plus-circle"
-            @click="$emit('openDialogAdd')"
         />
+<!--            @click="$emit('openDialogAdd')"-->
     </div>
 
-    <CategoryDialogAdd v-model="dialogAddState" />
-    <CategoryDialogEdit v-model="dialogEditState" :category-id="categoryToEditId" />
+<!--    <CategoryDialogAdd v-model="dialogAddState" />-->
+<!--    <CategoryDialogEdit v-model="dialogEditState" :category-id="categoryToEditId" />-->
 </template>
