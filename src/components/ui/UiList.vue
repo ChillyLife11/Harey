@@ -1,0 +1,83 @@
+<script setup>
+
+const $props = defineProps({
+    items: Array /* [{ title: string, prependIcon: string, appendIcon: string, color: string }] */
+})
+
+</script>
+
+<template>
+    <ul :class="'list'">
+        <li
+            v-for="item in $props.items"
+            v-bind="item"
+            class="item"
+            :class="[
+                `item--color-${ item.color ? item.color : 'default' }`,
+                { 'item--clickable': item.onclick || item.to }
+            ]"
+            v-wave
+        >
+            <router-link
+                v-if="item.to"
+                :to="item.to"
+            >
+                <span class="item__prepend">
+                    <i v-if="item['prepend-icon']" class="har prepend-icon"></i>
+                    <slot name="prepend" />
+                </span>
+                <div class="item__title">{{ item.title }}</div>
+                <span class="item__append">
+                    <slot name="append" />
+                    <i v-if="item['append-icon']" class="har append-icon"></i>
+                </span>
+            </router-link>
+            <template v-else>
+                <span class="item__prepend">
+                    <i v-if="item['prepend-icon']" class="har prepend-icon"></i>
+                    <slot name="prepend" />
+                </span>
+                <div class="item__title">{{ item.title }}</div>
+                <span class="item__append">
+                    <slot name="append" />
+                    <i v-if="item['append-icon']" class="har append-icon"></i>
+                </span>
+            </template>
+        </li>
+    </ul>
+</template>
+
+<style lang="scss" scoped>
+
+.list {
+    display: flex;
+    flex-direction: column;
+
+}
+.item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: .25s;
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+
+    &--color {
+        &-default { color: $secondary-400; }
+        &-danger  { color: $danger-400;    }
+    }
+    &--clickable {
+        &.item--color-default:hover,
+        &.item--color-default:focus { background-color: $secondary-50; }
+        &.item--color-danger:hover,
+        &.item--color-danger:focus { background-color: $danger-50; }
+    }
+
+
+    &__prepend, &__append { flex-shrink: 0; }
+
+    &__title { flex-grow: 1; }
+}
+
+</style>

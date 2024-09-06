@@ -1,41 +1,92 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import { useFloating } from "@floating-ui/vue";
+import { onMounted, onUpdated, ref, watch } from "vue";
+import { generateRandomString } from "@/utils/helpers.js";
+import { computePosition, offset, autoUpdate } from "@floating-ui/dom";
 
 const open = defineModel({ type: Boolean, default: false });
 
-const reference = ref(null);
-const floating = ref(null);
+const $props = defineProps({
+    placement: {
+        type   : String,
+        default: 'bottom',
+        validator(v) {
+            return ['top', 'top-start', 'top-end', 'right', 'right-start', 'right-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end'].includes(v);
+        }
+    },
+    closeOnContentClick: {
+        type   : Boolean,
+        default: true
+    }
+})
 
-const { floatingStyles } = useFloating(reference, floating);
+const id = ref(generateRandomString(5));
 
-function toggleMenu() {
-    console.log(1111);
-    open.value = !open.value;
-}
+function toggleMenu() { open.value = !open.value; }
 
-onMounted(() => {
-    document.addEventListener('click', e => {
+watch(open, newVal => {
+    if (newVal) document.addEventListener(   "click", listener);
+    else        document.removeEventListener("click", listener);
+
+    function listener(e) {
+        const trigger  = document.querySelector(`[data-menu-target="${id.value}"]`);
+        const floating = document.querySelector(`[data-menu="${id.value}"]`);
+
         if (
-            e.target !== reference.value
-            && e.composedPath().includes(reference.value)
-            && e.target !== floating.value
-            && e.composedPath().includes(floating.value)
+            e.target === trigger ||
+            e.composedPath().includes(trigger) ||
+            (
+                $props.closeOnContentClick ? false : (e.target === floating || e.composedPath().includes(floating))
+            )
         ) return;
 
         open.value = false;
-    });
+    }
+});
+
+onUpdated(() => {
+    const trigger  = document.querySelector(`[data-menu-target="${id.value}"]`);
+    const floating = document.querySelector(`[data-menu="${id.value}"]`);
+
+    autoUpdate(trigger, floating, () => {
+        computePosition(
+            trigger,
+            floating,
+            {
+                placement: $props.placement,
+            }
+        ).then(({ x, y }) => {
+            Object.assign(floating.style, {
+                left: `${ x }px`,
+                top:  `${ y }px`,
+            })
+        })
+    })
 });
 
 </script>
 
 <template>
-    {{ open }}
-    <slot name="trigger" ref="reference" @click="toggleMenu" />
-<!--    <Transition-->
-<!--        enter-active-class="animate__animated animate__flipX"-->
-<!--        leave-active-class="animate__animated animate__flipOut"-->
-<!--    >-->
-<!--        <slot v-if="open" ref="floating" :style="floatingStyles" />-->
-<!--    </Transition>-->
+    <slot name="trigger" :props="{ 'data-menu-target': id, onclick: toggleMenu }" />
+    <Transition
+        enter-active-class="animate__animated animate__fadeIn animate__faster"
+        leave-active-class="animate__animated animate__fadeOut animate__faster"
+    >
+        <div v-if="open" :data-menu="id" class="floating">
+            <slot :active="!!open" />
+        </div>
+    </Transition>
 </template>
+
+<style lang="scss">
+.floating {
+    isolation: isolate;
+    width: max-content;
+    position: absolute;
+    background-color: white;
+    border: 1px solid $secondary-50;
+    z-index: 2;
+    padding: 4px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+</style>

@@ -1,35 +1,59 @@
 <script setup>
-import { useCategoryStore } from '@/store/category.js';
-import CategoryList         from "@/components/category/CategoryList.vue";
-import CategoryDialogAdd    from "@/components/category/CategoryDialogAdd.vue";
-import { reactive, ref }    from "vue";
+import { reactive, onMounted } from "vue";
+import { useRouter, useRoute } from 'vue-router';
+import { useAccountStore } from "@/store/account.js";
+import CoreHashModal from "@/components/core/CoreHashModal.vue";
+import CoreNotifications from "@/components/core/CoreNotifications.vue";
 
-const categoryStore = useCategoryStore();
+const $router = useRouter();
+const $route  = useRoute();
 
-categoryStore.getList();
+const $account_store  = useAccountStore();
 
-const addDialogOpen = ref();
 const selectedShop = reactive({
     id: null,
     name: null,
+});
+
+onMounted(async () => {
+    await $account_store.init();
 });
 </script>
 
 <template>
     <div
-        class="py-4 text-center text-sky-400 text-2xl font-bold border-b border-b-slate-200"
+        class="header"
     >
+        <button v-if="$account_store.user" class="header__logout" type="button" @click="$account_store.signout"><i class="har har-log-out"></i></button>
         Harey
     </div>
-    <div class="p-3 py-8">
-        <CategoryList
-            :items="categoryStore.list"
-            @open-dialog-add="addDialogOpen = true"
-        />
-
-<!--        <CategoryDialogAdd-->
-<!--            v-if="addDialogOpen"-->
-<!--            v-model="addDialogOpen"-->
-<!--        />-->
+    <div v-if="$account_store.user || ['signin','signup'].includes($route.name)" class="main">
+        <router-view />
     </div>
+
+    <CoreHashModal />
+    <CoreNotifications />
 </template>
+
+<style lang="scss" scoped>
+.header {
+    padding: 16px 0;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    border-bottom: 1px solid $secondary-300;
+    position: relative;
+
+    &__logout {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $danger-600;
+    }
+}
+
+.main {
+    padding: 32px 12px;
+}
+</style>

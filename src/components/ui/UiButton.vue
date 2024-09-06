@@ -3,47 +3,41 @@
 import { computed } from "vue";
 
 const $props = defineProps({
-    text: {
-        type: String,
-    },
-    icon: {
-        type: String,
-        default: null
-    },
+    text:        { type: String, },
+    icon:        { type: String, default: null },
+    prependIcon: { type: String, default: null },
+    appendIcon:  { type: String, default: null },
+
+    active  : { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    loading : { type: Boolean, default: false },
+
     size: {
-        type: String,
+        type   : String,
         default: 'default',
         validator(value, props) {
             return ['sm', 'default', 'lg'].includes(value)
         }
     },
     color: {
-        type: String,
+        type   : String,
         default: 'primary',
         validator(value) {
             return ['primary', 'secondary', 'warning', 'danger', 'success', 'info'].includes(value)
         }
     },
     variant: {
-        type: String,
+        type   : String,
         default: 'default',
         validator(value) {
             return ['default', 'tonal', 'ghost', 'outlined'].includes(value)
         }
     },
-    prependIcon: {
-        type: String,
-        default: null
-    },
-    appendIcon: {
-        type: String,
-        default: null
-    },
 });
 
 const waveColor = computed(() => {
     if ($props.variant === 'default') return 'white';
-    if ($props.variant === 'tonal') return 'black';
+    if ($props.variant === 'tonal')   return 'black';
 });
 
 </script>
@@ -51,81 +45,180 @@ const waveColor = computed(() => {
 <template>
     <button
         :class="[
-            'ui-btn--color-' + $props.color,
-            'ui-btn--variant-' + $props.variant,
-            { 'ui-btn--icon': $props.icon }
+            'btn',
+            'btn--color-' + $props.color,
+            'btn--variant-' + $props.variant,
+            'btn--size-' + $props.size,
+            { 'btn--icon': $props.icon, 'btn--active': $props.active, 'btn--disabled': $props.disabled || $props.loading }
         ]"
-        class="ui-btn"
         type="button"
-        v-wave="{
-            initialOpacity: 0.7
-        }"
+        v-wave="{ initialOpacity: 0.7 }"
     >
-        <div class="ui-btn__content">
-            <i v-if="$props.icon" class="asi" :class="$props.icon"></i>
+        <span class="btn__prepend">
+            <i v-if="$props.prependIcon" class="har" :class="$props.prependIcon"></i>
+            <slot name="prepend" />
+        </span>
+        <div class="btn__content">
+            <slot v-if="!$props.icon && !$props.text"></slot>
+            <span v-if="$props.loading" class="btn__loader">
+                <i class="har har-loading"></i>
+            </span>
+            <i v-if="$props.icon && !$props.text" class="har" :class="$props.icon"></i>
+            <template v-else>{{ $props.text }}</template>
         </div>
+        <span class="btn__append">
+            <slot name="append" />
+            <i v-if="$props.appendIcon" class="har" :class="$props.appendIcon"></i>
+        </span>
     </button>
 </template>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 
-.ui-btn {
-    display: flex;
+$icon_size: 16px;
+
+.btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: .25s;
+    position: relative;
 
-    @apply h-9 px-4 rounded-lg;
+    &--size {
+        &-default {
+            height: 36px;
+            padding: 0 16px;
+            border-radius: 4px;
+            font-size: 14px;
 
+            .btn__prepend, .btn__append { font-size: 16px }
+        }
+    }
     &--icon {
-        @apply w-9 px-0;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+
+        .btn__content { font-size: 20px }
     }
 
-    &--color {
-        &-primary {
-
-        }
-        &-secondary {
-            color: theme('colors.secondary.700');
-        }
-        &-danger {
-            color: theme('colors.danger.700');
-        }
-        &-warning {
-            color: theme('colors.warning.700');
-        }
-    }
     &--variant-default {
-        &.ui-btn--color-primary   { background-color: theme('colors.primary.700');   color: #fff; &:hover { background-color: theme('colors.primary.600');   } }
-        &.ui-btn--color-secondary { background-color: theme('colors.secondary.700'); color: #fff; &:hover { background-color: theme('colors.secondary.600'); } }
-        &.ui-btn--color-danger    { background-color: theme('colors.danger.700');    color: #fff; &:hover { background-color: theme('colors.danger.600');    } }
-        &.ui-btn--color-warning   { background-color: theme('colors.warning.700');   color: #fff; &:hover { background-color: theme('colors.warning.600');   } }
+        &.btn--color-primary   {
+            background-color: $primary-700;
+            color: #fff;
+            &:hover { background-color: $primary-600; }
+            &:focus { background-color: $primary-600; }
+        }
+        &.btn--color-secondary {
+            background-color: $secondary-700;
+            color: #fff;
+            &:hover { background-color: $secondary-600; }
+            &:focus { background-color: $secondary-600; }
+        }
+        &.btn--color-danger    {
+            background-color: $danger-700;
+            color: #fff;
+            &:hover { background-color: $danger-600; }
+            &:focus { background-color: $danger-600; }
+        }
+        &.btn--color-warning   {
+            background-color: $warning-700;
+            color: #fff;
+            &:hover { background-color: $warning-600; }
+            &:focus { background-color: $warning-600; }
+        }
     }
     &--variant-default &__content {
         color: #fff;
-        i {
-            color: #fff;
-        }
+        i { color: #fff; }
     }
 
     &--variant-tonal {
-        &.ui-btn--color-primary   { background-color: theme('colors.primary.100');   color: theme('colors.primary.700');   &:hover { background-color: theme('colors.primary.300') } }
-        &.ui-btn--color-secondary { background-color: theme('colors.secondary.100'); color: theme('colors.secondary.700'); &:hover { background-color: theme('colors.secondary.300') } }
-        &.ui-btn--color-danger    { background-color: theme('colors.danger.100');    color: theme('colors.danger.700');    &:hover { background-color: theme('colors.danger.300') } }
-        &.ui-btn--color-warning   { background-color: theme('colors.warning.100');   color: theme('colors.warning.700');   &:hover { background-color: theme('colors.warning.300') } }
+        &.btn--color-primary   {
+            background-color: $primary-100;
+            color: $primary-700;
+            &:hover { background-color: $primary-200; }
+            &:focus { background-color: $primary-200; }
+        }
+        &.btn--color-secondary {
+            background-color: $secondary-100;
+            color: $secondary-700;
+            &:hover { background-color: $secondary-300; }
+            &:focus { background-color: $secondary-300; }
+        }
+        &.btn--color-danger    {
+            background-color: $danger-100;
+            color: $danger-700;
+            &:hover { background-color: $danger-300; }
+            &:focus { background-color: $danger-300; }
+        }
+        &.btn--color-warning   {
+            background-color: $warning-100;
+            color: $warning-700;
+            &:hover { background-color: $warning-300; }
+            &:focus { background-color: $warning-300; }
+        }
     }
 
     &--variant-ghost {
-        &.ui-btn--color-primary   { background-color: transparent; color: theme('colors.primary.700');   &:hover { background-color: theme('colors.primary.100'); } }
-        &.ui-btn--color-secondary { background-color: transparent; color: theme('colors.secondary.700'); &:hover { background-color: theme('colors.secondary.100'); } }
-        &.ui-btn--color-danger    { background-color: transparent; color: theme('colors.danger.700');    &:hover { background-color: theme('colors.danger.100'); } }
-        &.ui-btn--color-warning   { background-color: transparent; color: theme('colors.warning.700');   &:hover { background-color: theme('colors.warning.100'); } }
+        &.btn--color-primary   {
+            background-color: transparent;
+            color: $primary-700;
+            &:hover { background-color: $primary-100; }
+            &:focus { background-color: $primary-100; }
+        }
+        &.btn--color-secondary {
+            background-color: transparent;
+            color: $secondary-500;
+            &:hover { background-color: $secondary-100; }
+            &:focus { background-color: $secondary-100; }
+        }
+        &.btn--color-danger    {
+            background-color: transparent;
+            color: $danger-700;
+            &:hover { background-color: $danger-100; }
+            &:focus { background-color: $danger-100; }
+        }
+        &.btn--color-warning   {
+            background-color: transparent;
+            color: $warning-700;
+            &:hover { background-color: $warning-100; }
+            &:focus { background-color: $warning-100; }
+        }
+    }
+
+    &--disabled {
+        pointer-events: none;
+        opacity: .6;
     }
 
     &__content {
+        flex-grow: 1;
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    &__prepend, &__append {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+
+        i { display: block; }
+    }
+
+    &__prepend:has(*) { margin-right: 8px; }
+    &__append:has(*)  { margin-left:  8px; }
+
+    &__loader {
+        display: block;
+        margin-right: 8px;
+        animation: fullRotateAnim 1.5s linear infinite;
+        font-size: 16px;
+
+        i {
+            display: block;
+        }
     }
 }
 
