@@ -43,12 +43,12 @@ function deleteCategory() {
                 <UiList :items="[
                     {
                         title:       'Редактировать',
-                        prependIcon: 'har-edit',
+                        prepend_icon: 'har-edit',
                         onclick:     openDialogEdit
                     },
                     {
                         title: 'Удалить',
-                        prependIcon: 'har-trash',
+                        prepend_icon: 'har-trash',
                         color: 'danger',
                         onclick: deleteCategory
                     },

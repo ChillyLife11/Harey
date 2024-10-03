@@ -1,7 +1,7 @@
 <script setup>
 
 const $props = defineProps({
-    items: Array /* [{ title: string, prependIcon: string, appendIcon: string, color: string }] */
+    items: Array /* [{ title: string, prepend_icon: string, append_icon: string, color: string }] */
 })
 
 </script>
@@ -23,24 +23,24 @@ const $props = defineProps({
                 :to="item.to"
             >
                 <span class="item__prepend">
-                    <i v-if="item['prepend-icon']" class="har prepend-icon"></i>
+                    <i v-if="item.prepend_icon" :class="['har prepend-icon', item.prepend_icon]"></i>
                     <slot name="prepend" />
                 </span>
                 <div class="item__title">{{ item.title }}</div>
                 <span class="item__append">
                     <slot name="append" />
-                    <i v-if="item['append-icon']" class="har append-icon"></i>
+                    <i v-if="item.append_icon" :class="['har append-icon', item.append_icon]"></i>
                 </span>
             </router-link>
             <template v-else>
                 <span class="item__prepend">
-                    <i v-if="item['prepend-icon']" class="har prepend-icon"></i>
+                    <i v-if="item.prepend_icon" :class="['har prepend-icon', item.prepend_icon]"></i>
                     <slot name="prepend" />
                 </span>
                 <div class="item__title">{{ item.title }}</div>
                 <span class="item__append">
                     <slot name="append" />
-                    <i v-if="item['append-icon']" class="har append-icon"></i>
+                    <i v-if="item.append_icon" :class="['har append-icon', item.append_icon]"></i>
                 </span>
             </template>
         </li>
@@ -55,13 +55,25 @@ const $props = defineProps({
 
 }
 .item {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: .25s;
-    padding: 6px 8px;
-    font-size: 12px;
-    border-radius: 4px;
+    &:not(:has(> a)) {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: .25s;
+        padding: 6px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    > a {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: .25s;
+        padding: 6px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
 
     &--color {
         &-default { color: $secondary-400; }
@@ -77,7 +89,7 @@ const $props = defineProps({
 
     &__prepend, &__append { flex-shrink: 0; }
 
-    &__title { flex-grow: 1; }
+    &__title { flex-grow: 1; margin-left: 8px; margin-right: 8px }
 }
 
 </style>

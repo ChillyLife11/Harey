@@ -1,26 +1,52 @@
 import { defineStore } from "pinia";
+import { account } from "@/appwrite.js";
+import { ID } from "appwrite";
 import { useRouter } from "vue-router";
-import { nhost } from "@/nhost.js";
+import { ERRORS } from "@/constants.js";
+
+const $router = useRouter();
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
-        user: null,
+        user: {
+            email : '',
+            name  : '',
+            status: false,
+        }
     }),
+    getters: {
+        authed: state => state.user.status,
+    },
     actions: {
         async init() {
-            const $router   = useRouter();
-
-            this.user = await nhost.auth.getSession();
-            nhost.auth.onAuthStateChanged((_, newSession) => {
-                this.user = newSession;
-
-                if (!this.user && !/\b(signup|signin)\b/.test(window.location.href))    $router.push({ name: 'signin' });
-                else if (this.user && /\b(signup|signin)\b/.test(window.location.href)) $router.push({ name: 'home' });
-            });
+            try {
+                const user = await account.get();
+                this.user.email  = user.email;
+                this.user.name   = user.name;
+                this.user.status = user.status;
+            } catch(e) {
+                throw new Error(ERRORS[e.type] || 'Неизвестная ошибка');
+            }
         },
-
+        async signup(email, password, name) {
+            try {
+                await account.create(ID.unique(), email, password, name);
+            } catch(e) {
+                throw new Error(ERRORS[e.type] || 'Неизвестная ошибка при регистрации');
+            }
+        },
+        async signin(email, password) {
+            await account.createEmailPasswordSession(email, password);
+        },
         async signout() {
-            const { error } = await nhost.auth.signOut();
+            try {
+                await account.deleteSession('current');
+                this.user.email  = '';
+                this.user.name   = '';
+                this.user.status = false;
+            } catch(e) {
+                throw new Error(ERRORS[e.type] || 'Неизвестная ошибка при выходе из аккаунта');
+            }
         }
     }
 });

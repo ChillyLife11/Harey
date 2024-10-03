@@ -7,10 +7,12 @@ import { ref, watch } from "vue";
 import { ERRORS } from "@/constants.js";
 import { useRouter } from "vue-router";
 import { useNotifications } from "@/composables/useNotifications.js";
-import { nhost } from "@/nhost.js";
+import { useAccountStore } from "@/store/account.js";
+// import { nhost } from "@/nhost.js";
 
-const $router       = useRouter();
-const $notification = useNotifications();
+const $router        = useRouter();
+const $notification  = useNotifications();
+const $account_store = useAccountStore();
 
 const { values, setFieldError, validate } = useForm({
     validationSchema: toTypedSchema(z.object({
@@ -33,22 +35,16 @@ async function signin(values) {
 
     loading.value = true;
 
-    const { error } = await nhost.auth.signIn({
-        email   : email.value.value,
-        password: password.value.value,
-    });
-
-    if (error) {
-        $notification.notify({ type: 'error', icon: 'alert-circle', title: ERRORS[error.error] });
-
-    } else {
-        $router.push({ name: 'home' });
-
-        loading.value = false;
+    try {
+        await $account_store.signin(email.value.value, password.value.value);
+        await $router.push({ name: 'home' });
         $notification.notify({ type: 'success', icon: 'check', title: 'Отлично!', description: 'Вы успешно вошли в аккаунт' });
+    } catch(e) {
+        $notification.notify({ type: 'error', icon: 'alert-circle', title: e.message });
+    } finally {
+        loading.value = false;
     }
 
-    loading.value = false;
 }
 
 </script>

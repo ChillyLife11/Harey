@@ -20,7 +20,7 @@ const id_hash = generateRandomString();
 const { values, setFieldValue, setFieldError, validate } = useForm({
     validationSchema: toTypedSchema(z.object({
         title        : z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(2, 'Минимум 2 буквы'),
-        default_price: z.string().max(10),
+        default_price: z.number().max(1000000),
     }))
 });
 

@@ -1,6 +1,4 @@
-export default {
-    NHOST: {
-        REGION   : import.meta.env.VITE_NH_REGION,
-        SUBDOMAIN: import.meta.env.VITE_NH_SUBDOMAIN,
-    }
-}
+export const APPWRITE = {
+    ID   : import.meta.env.VITE_APPWRITE_ID,
+    DB_ID: import.meta.env.VITE_APPWRITE_DB_ID,
+};

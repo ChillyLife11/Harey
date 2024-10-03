@@ -7,16 +7,17 @@ import { ref, watch } from "vue";
 import { ERRORS } from "@/constants.js";
 import { useRouter } from "vue-router";
 import { useNotifications } from "@/composables/useNotifications.js";
-import { nhost } from "@/nhost.js";
+import { useAccountStore } from "@/store/account.js";
 
-const $router       = useRouter();
-const $notification = useNotifications();
+const $router        = useRouter();
+const $notification  = useNotifications();
+const $account_store = useAccountStore();
 
 const { values, setFieldError, validate } = useForm({
     validationSchema: toTypedSchema(z.object({
         email   : z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').email('Некорректная почта'),
         name    : z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(2, 'Минимум 2 буквы'),
-        password: z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(6, 'Минимум 6 символов').max(64, 'Максимум 64 символа'),
+        password: z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(8, 'Минимум 8 символов').max(64, 'Максимум 64 символа'),
     }))
 });
 
@@ -30,31 +31,21 @@ watch(() => email   .value.value, () => setFieldError('email',    null));
 watch(() => name    .value.value, () => setFieldError('name',     null));
 watch(() => password.value.value, () => setFieldError('password', null));
 
-async function signup(values) {
+async function signup() {
     const { valid } = await validate();
     if (!valid) return;
 
     loading.value = true;
 
-    const { error } = await nhost.auth.signUp({
-        email   : email.value.value,
-        password: password.value.value,
-        options : {
-            metadata: { name: name.value.value }
-        }
-    });
-
-    if (error) {
-        $notification.notify({ type: 'error', icon: 'alert-circle', title: ERRORS[error.error] });
-
-    } else {
-        $router.push({ name: 'signin' });
-
+    try {
+        await $account_store.signup(email.value.value, password.value.value, name.value.value);
+        await $router.push({ name: 'signin' });
+        $notification.notify({ type: 'success', icon: 'check', title: 'Отлично!', description: 'Вы успешно зарегистрировались!' });
+    } catch (e) {
+        $notification.notify({ type: 'error', icon: 'alert-circle', title: e.message });
+    } finally {
         loading.value = false;
-        $notification.notify({ type: 'success', icon: 'check', title: 'Отлично!', description: 'Вы успешно зарегистрировались, теперь войдите в аккаунт' });
     }
-
-    loading.value = false;
 }
 
 </script>

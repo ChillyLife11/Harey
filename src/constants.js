@@ -1,3 +1,8 @@
 export const ERRORS = {
-    'email-already-in-use': 'Указанная почта уже используется'
+    'user_already_exists'        : 'Такой пользователь уже существует',
+    'general_rate_limit_exceeded': 'Превышен лимит попыток, попробуйте позже',
 };
+
+export const COLLECTIONS = {
+    categories: '66f1174f000c77e665c7'
+}

@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from "@/store/account.js";
 import CoreHashModal from "@/components/core/CoreHashModal.vue";
 import CoreNotifications from "@/components/core/CoreNotifications.vue";
+import { account } from "@/appwrite.js";
 
 const $router = useRouter();
 const $route  = useRoute();
@@ -16,7 +17,15 @@ const selectedShop = reactive({
 });
 
 onMounted(async () => {
-    await $account_store.init();
+    try {
+        await $account_store.init();
+
+        if (window.location.href.includes('signin') || window.location.href.includes('signup')) {
+            await $router.push({ name: 'home' });
+        }
+    } catch {
+        await $router.push({ name: 'signin' });
+    }
 });
 </script>
 
@@ -24,10 +33,10 @@ onMounted(async () => {
     <div
         class="header"
     >
-        <button v-if="$account_store.user" class="header__logout" type="button" @click="$account_store.signout"><i class="har har-log-out"></i></button>
+        <button v-if="$account_store.authed" class="header__logout" type="button" @click="$account_store.signout"><i class="har har-log-out"></i></button>
         Harey
     </div>
-    <div v-if="$account_store.user || ['signin','signup'].includes($route.name)" class="main">
+    <div class="main">
         <router-view />
     </div>
 

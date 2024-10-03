@@ -81,7 +81,7 @@ async function createCat() {
             />
         </form>
         <template #footer>
-            <UiButton prepend-icon="har-close" text="Закрыть" variant="tonal" @click="closeDIalog" />
+            <UiButton prepend-icon="har-close" text="Отмена" variant="tonal" @click="closeDIalog" />
             <UiButton type="submit" prepend-icon="har-check" text="Подтвердить" :form="'form-'+id_hash" />
         </template>
     </UiDialog>

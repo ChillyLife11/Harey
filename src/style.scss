@@ -207,6 +207,12 @@ body {
   text-align: center;
 }
 
+.subtitle {
+  font-size: 18px;
+  text-align: left;
+  font-weight: 600;
+}
+
 @keyframes fullRotateAnim {
     from { transform: rotate(0deg); }
     from { transform: rotate(360deg); }

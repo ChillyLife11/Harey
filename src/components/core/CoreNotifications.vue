@@ -25,7 +25,7 @@ const { contents, removeNotification } = useNotifications();
 
 <style lang="scss" scoped>
 .notifications {
-    position: absolute;
+    position: fixed;
     left: 12px;
     bottom: 12px;
     width: calc(100% - 24px);

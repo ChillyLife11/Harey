@@ -30,7 +30,7 @@ const $props = defineProps({
         type   : String,
         default: 'default',
         validator(value) {
-            return ['default', 'tonal', 'ghost', 'outlined'].includes(value)
+            return ['default', 'tonal', 'ghost', 'outlined', 'link'].includes(value)
         }
     },
 });
@@ -52,7 +52,7 @@ const waveColor = computed(() => {
             { 'btn--icon': $props.icon, 'btn--active': $props.active, 'btn--disabled': $props.disabled || $props.loading }
         ]"
         type="button"
-        v-wave="{ initialOpacity: 0.7 }"
+        v-wave="$props.variant === 'link' ? false : { initialOpacity: 0.7 }"
     >
         <span class="btn__prepend">
             <i v-if="$props.prependIcon" class="har" :class="$props.prependIcon"></i>
@@ -106,25 +106,21 @@ $icon_size: 16px;
         &.btn--color-primary   {
             background-color: $primary-700;
             color: #fff;
-            &:hover { background-color: $primary-600; }
             &:focus { background-color: $primary-600; }
         }
         &.btn--color-secondary {
             background-color: $secondary-700;
             color: #fff;
-            &:hover { background-color: $secondary-600; }
             &:focus { background-color: $secondary-600; }
         }
         &.btn--color-danger    {
             background-color: $danger-700;
             color: #fff;
-            &:hover { background-color: $danger-600; }
             &:focus { background-color: $danger-600; }
         }
         &.btn--color-warning   {
             background-color: $warning-700;
             color: #fff;
-            &:hover { background-color: $warning-600; }
             &:focus { background-color: $warning-600; }
         }
     }
@@ -137,25 +133,21 @@ $icon_size: 16px;
         &.btn--color-primary   {
             background-color: $primary-100;
             color: $primary-700;
-            &:hover { background-color: $primary-200; }
             &:focus { background-color: $primary-200; }
         }
         &.btn--color-secondary {
             background-color: $secondary-100;
             color: $secondary-700;
-            &:hover { background-color: $secondary-300; }
             &:focus { background-color: $secondary-300; }
         }
         &.btn--color-danger    {
             background-color: $danger-100;
             color: $danger-700;
-            &:hover { background-color: $danger-300; }
             &:focus { background-color: $danger-300; }
         }
         &.btn--color-warning   {
             background-color: $warning-100;
             color: $warning-700;
-            &:hover { background-color: $warning-300; }
             &:focus { background-color: $warning-300; }
         }
     }
@@ -164,26 +156,31 @@ $icon_size: 16px;
         &.btn--color-primary   {
             background-color: transparent;
             color: $primary-700;
-            &:hover { background-color: $primary-100; }
             &:focus { background-color: $primary-100; }
         }
         &.btn--color-secondary {
             background-color: transparent;
             color: $secondary-500;
-            &:hover { background-color: $secondary-100; }
             &:focus { background-color: $secondary-100; }
         }
         &.btn--color-danger    {
             background-color: transparent;
             color: $danger-700;
-            &:hover { background-color: $danger-100; }
             &:focus { background-color: $danger-100; }
         }
         &.btn--color-warning   {
             background-color: transparent;
             color: $warning-700;
-            &:hover { background-color: $warning-100; }
             &:focus { background-color: $warning-100; }
+        }
+    }
+
+    &--variant-link {
+        height: unset;
+        padding: 0;
+
+        &.btn--color-primary {
+            color: $primary-700;
         }
     }
 
