@@ -17,28 +17,24 @@ onMounted(() => $category_store.getList(3));
     <div class="categories">
         <div class="categories__top">
             <div class="subtitle">Категории</div>
-            <div style="display:flex; align-items: center;">
-                <span style="margin-right: 8px;">Показать все</span>
-                <span style="font-size: 20px; opacity: .3;">|</span>
-                <UiMenu v-model="additional_category_menu" placement="bottom-end">
-                    <template #trigger="{ props }">
-                        <UiButton v-bind="props" :ref="ref" variant="ghost" color="secondary" icon="har-chevron-down" />
-                    </template>
+            <UiMenu v-model="additional_category_menu" placement="bottom-end">
+                <template #trigger="{ props }">
+                    <UiButton v-bind="props" :ref="ref" variant="ghost" color="secondary" icon="har-menu-dots" />
+                </template>
 
-                    <UiList :items="[
-                        {
-                            title       : 'Добавить',
-                            prepend_icon: 'har-plus',
-                            onclick     : () => category_add_dialog = true
-                        },
-                        {
-                            title       : 'Удалить все',
-                            prepend_icon: 'har-close',
-                            color       : 'danger'
-                        },
-                    ]" />
-                </UiMenu>
-            </div>
+                <UiList :items="[
+                    {
+                        title       : 'Добавить',
+                        prepend_icon: 'har-plus',
+                        onclick     : () => category_add_dialog = true
+                    },
+                    {
+                        title       : 'Удалить все',
+                        prepend_icon: 'har-close',
+                        color       : 'danger'
+                    },
+                ]" />
+            </UiMenu>
         </div>
         <CategoryList :items="$category_store.list" />
     </div>

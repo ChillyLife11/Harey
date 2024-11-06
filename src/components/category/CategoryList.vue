@@ -12,15 +12,10 @@ const $props = defineProps({
 
 const local_items = ref([]);
 
-const dialog_add_state  = ref(false);
 const dialog_edit_state = ref(false);
 const curr_category_id  = ref(null);
 
 watch(() => $props.items, new_items => local_items.value = [...new_items]);
-
-function openDialogAdd() {
-    dialog_add_state.value = true;
-}
 
 function openDialogEdit(category_id) {
     curr_category_id .value = category_id;
@@ -32,7 +27,6 @@ function onChange({ moved }) {
 
     if (moved.newIndex > moved.oldIndex) {
         const diff = moved.newIndex - moved.oldIndex;
-
     }
 }
 
@@ -57,16 +51,9 @@ function onChange({ moved }) {
                     <CategoryItem :title="element.title" :id="element.id" @open-dialog-edit="openDialogEdit(element.id)" />
                 </div>
             </template>
-            <template #footer>
-                <CategoryItem
-                    icon="har-plus-circle"
-                    @click="openDialogAdd"
-                />
-            </template>
         </draggable>
 
 
-        <CategoryDialogAdd  v-model="dialog_add_state" />
         <CategoryDialogEdit v-model="dialog_edit_state" :id="curr_category_id" />
     </div>
 </template>
