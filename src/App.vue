@@ -16,16 +16,15 @@ const selectedShop = reactive({
     name: null,
 });
 
+async function signout() {
+    await $account_store.signout();
+    await $router.push({ name: 'signin' });
+}
+
 onMounted(async () => {
     try {
         await $account_store.init();
-
-        if (window.location.href.includes('signin') || window.location.href.includes('signup')) {
-            await $router.push({ name: 'home' });
-        }
-    } catch {
-        await $router.push({ name: 'signin' });
-    }
+    } catch {}
 });
 </script>
 
@@ -33,7 +32,7 @@ onMounted(async () => {
     <div
         class="header"
     >
-        <button v-if="$account_store.authed" class="header__logout" type="button" @click="$account_store.signout"><i class="har har-log-out"></i></button>
+        <button v-if="$account_store.is_authed" class="header__logout" type="button" @click="signout"><i class="har har-log-out"></i></button>
         Harey
     </div>
     <div class="main">

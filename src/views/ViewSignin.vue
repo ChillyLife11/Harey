@@ -44,7 +44,6 @@ async function signin(values) {
     } finally {
         loading.value = false;
     }
-
 }
 
 </script>

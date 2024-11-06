@@ -13,9 +13,7 @@ function notify(notification) {
 
     contents.value.push({ id, ...notification });
 
-    setTimeout(() => {
-        removeNotification(id)
-    }, NOTIFICATION_DURATION);
+    setTimeout(() => removeNotification(id), NOTIFICATION_DURATION);
 }
 
 function removeNotification(id) {

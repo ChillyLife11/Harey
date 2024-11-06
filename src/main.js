@@ -11,8 +11,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(pinia);
-app.use(router)
-app.use(VWave)
-
+app.use(router);
+app.use(VWave);
 
 app.mount('#app');

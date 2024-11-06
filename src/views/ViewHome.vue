@@ -32,11 +32,6 @@ onMounted(() => $category_store.getList(3));
                             onclick     : () => category_add_dialog = true
                         },
                         {
-                            title       : 'Показать все',
-                            prepend_icon: 'har-arrow-up-right',
-                            to          : { name: 'categories' }
-                        },
-                        {
                             title       : 'Удалить все',
                             prepend_icon: 'har-close',
                             color       : 'danger'

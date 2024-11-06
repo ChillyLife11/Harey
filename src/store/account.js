@@ -8,22 +8,16 @@ const $router = useRouter();
 
 export const useAccountStore = defineStore('account', {
     state: () => ({
-        user: {
-            email : '',
-            name  : '',
-            status: false,
-        }
+        session: null,
+        user   : null
     }),
     getters: {
-        authed: state => state.user.status,
+        is_authed: state => !!state.user,
     },
     actions: {
         async init() {
             try {
-                const user = await account.get();
-                this.user.email  = user.email;
-                this.user.name   = user.name;
-                this.user.status = user.status;
+                this.user = await account.get();
             } catch(e) {
                 throw new Error(ERRORS[e.type] || 'Неизвестная ошибка');
             }
@@ -36,14 +30,17 @@ export const useAccountStore = defineStore('account', {
             }
         },
         async signin(email, password) {
-            await account.createEmailPasswordSession(email, password);
+            try {
+                await account.createEmailPasswordSession(email, password);
+                this.init();
+            } catch (e) {
+                throw new Error(ERRORS[e.type] || 'Неизвестная ошибка при входе');
+            }
         },
         async signout() {
             try {
                 await account.deleteSession('current');
-                this.user.email  = '';
-                this.user.name   = '';
-                this.user.status = false;
+                this.user = null;
             } catch(e) {
                 throw new Error(ERRORS[e.type] || 'Неизвестная ошибка при выходе из аккаунта');
             }
