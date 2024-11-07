@@ -32,6 +32,10 @@ async function onChange({ moved }) {
         for (let a = moved.oldIndex; a < moved.newIndex; a++) {
             local_items.value[a].sort++;
         }
+    } else {
+        for (let a = moved.newIndex; a < moved.oldIndex; a++) {
+            local_items.value[a + 1].sort--;
+        }
     }
 
     try {
@@ -46,6 +50,17 @@ async function onChange({ moved }) {
 
         if (moved.newIndex > moved.oldIndex) {
             for (let a = moved.oldIndex; a < moved.newIndex; a++) {
+                await databases.updateDocument(
+                    APPWRITE.DB_ID,
+                    APPWRITE.CATEGORIES_ID,
+                    local_items.value[a].$id,
+                    {
+                        sort: local_items.value[a].sort
+                    }
+                );
+            }
+        } else {
+            for (let a = moved.newIndex; a < moved.oldIndex; a++) {
                 await databases.updateDocument(
                     APPWRITE.DB_ID,
                     APPWRITE.CATEGORIES_ID,
