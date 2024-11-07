@@ -25,54 +25,43 @@ function openDialogEdit(category_id) {
 
 async function onChange({ moved }) {
     const category_id = moved.element.$id;
+    const newIndex = moved.newIndex;
+    const oldIndex = moved.oldIndex;
 
-    local_items.value[moved.newIndex].sort = local_items.value.length - moved.newIndex;
+    local_items.value[newIndex].sort = local_items.value.length - newIndex;
 
-    if (moved.newIndex > moved.oldIndex) {
-        for (let a = moved.oldIndex; a < moved.newIndex; a++) {
-            local_items.value[a].sort++;
-        }
-    } else {
-        for (let a = moved.newIndex; a < moved.oldIndex; a++) {
-            local_items.value[a + 1].sort--;
-        }
+    const isMovingDown = newIndex > oldIndex;
+    const updatePromises = [];
+
+    const start = isMovingDown ? oldIndex : newIndex;
+    const end = isMovingDown ? newIndex : oldIndex;
+    const step = isMovingDown ? 1 : -1;
+
+    for (let i = start; (isMovingDown ? i < end : i > end); i += step) {
+        local_items.value[i].sort += step;
+        updatePromises.push(
+            databases.updateDocument(
+                APPWRITE.DB_ID,
+                APPWRITE.CATEGORIES_ID,
+                local_items.value[i].$id,
+                { sort: local_items.value[i].sort }
+            )
+        );
     }
 
-    try {
-        await databases.updateDocument(
+    updatePromises.push(
+        databases.updateDocument(
             APPWRITE.DB_ID,
             APPWRITE.CATEGORIES_ID,
             category_id,
-            {
-                sort: local_items.value[moved.newIndex].sort
-            }
-        );
+            { sort: local_items.value[newIndex].sort }
+        )
+    );
 
-        if (moved.newIndex > moved.oldIndex) {
-            for (let a = moved.oldIndex; a < moved.newIndex; a++) {
-                await databases.updateDocument(
-                    APPWRITE.DB_ID,
-                    APPWRITE.CATEGORIES_ID,
-                    local_items.value[a].$id,
-                    {
-                        sort: local_items.value[a].sort
-                    }
-                );
-            }
-        } else {
-            for (let a = moved.newIndex; a < moved.oldIndex; a++) {
-                await databases.updateDocument(
-                    APPWRITE.DB_ID,
-                    APPWRITE.CATEGORIES_ID,
-                    local_items.value[a].$id,
-                    {
-                        sort: local_items.value[a].sort
-                    }
-                );
-            }
-        }
+    try {
+        await Promise.all(updatePromises);
     } catch (e) {
-        console.log(e);
+        console.error('Error updating documents:', e);
     }
 }
 
