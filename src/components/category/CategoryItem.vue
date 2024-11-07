@@ -23,6 +23,7 @@ function openDialogEdit() {
 }
 function deleteCategory() {
     try {
+        console.log($props.id)
         $category_store.delete($props.id);
         notify({ type: 'success', title: 'Категория успешно удалена', icon: 'check' });
     } catch (e) {

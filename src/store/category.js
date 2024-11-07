@@ -33,7 +33,20 @@ export const useCategoryStore = defineStore('category', {
                     { title, default_price, user_id: $account_store.user.$id, sort: current_max_sort_number + 1 }
                 );
             } catch (e) {
-                throw new Error(ERRORS[e.type] || 'Неизвестная ошибка при добавлении категории');
+                throw new Error(ERRORS[e.type] || 'Ошибка при добавлении категории');
+            }
+        },
+        async delete(id) {
+            try {
+                await databases.deleteDocument(
+                    APPWRITE.DB_ID,
+                    APPWRITE.CATEGORIES_ID,
+                    id
+                );
+
+                await this.getList();
+            } catch (e) {
+                throw new Error(ERRORS[e.type] || 'Ошибка при удалении категории');
             }
         }
     }

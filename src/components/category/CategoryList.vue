@@ -83,7 +83,7 @@ async function onChange({ moved }) {
             <template #item="{ element }">
                 <div>
 <!--                    sort: {{ element.sort }}-->
-                    <CategoryItem :title="element.title" :id="element.id" @open-dialog-edit="openDialogEdit(element.id)" />
+                    <CategoryItem :id="element.$id" :title="element.title" @open-dialog-edit="openDialogEdit(element.id)" />
                 </div>
             </template>
         </draggable>
