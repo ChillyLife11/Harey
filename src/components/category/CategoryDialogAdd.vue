@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { useNotifications } from "@/composables/useNotifications.js";
 
 const $category_store = useCategoryStore();
-const { notify } = useNotifications();
+const $notifications  = useNotifications();
 
 const open = defineModel({ type: Boolean, default: false });
 
@@ -17,12 +17,12 @@ const id_hash = generateRandomString();
 
 const { values, setFieldValue, setFieldError, validate } = useForm({
     validationSchema: toTypedSchema(z.object({
-        title         : z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(2, 'Минимум 2 буквы'),
-        default_price: z.string().max(10),
+        title        : z.string({ required_error: 'Обязательное поле' }).min(1, 'Обязательное поле').min(2, 'Минимум 2 буквы'),
+        default_price: z.number().max(99999, 'Максимум 99 999').min(10, 'Минимум 10'),
     }))
 });
 
-const title         = useField('title',     null, { validateOnValueUpdate: false });
+const title         = useField('title'        , null, { validateOnValueUpdate: false });
 const default_price = useField('default_price', null, { validateOnValueUpdate: false });
 
 const loading = ref(false);
@@ -30,7 +30,7 @@ const loading = ref(false);
 watch(() => title        .value.value, () => setFieldError('title',          null));
 watch(() => default_price.value.value, () => setFieldError('default_price', null));
 
-function closeDIalog() {
+function closeDialog() {
     open.value = false;
 }
 
@@ -46,12 +46,13 @@ async function createCat() {
     loading.value = true;
 
     try {
+
         await $category_store.add(title.value.value, default_price.value.value);
-        notify({ type: "success", title: 'Категория успешно добавлена', icon: 'alert-check' })
+        $notifications.notify({ type: "success", title: 'Категория успешно добавлена', icon: 'alert-check' })
     } catch(e) {
-        notify({ type: "error", title: 'Неизвестная ошибка, повторите позже', icon: 'alert-circle' })
+        $notifications.notify({ type: "error", title: 'Неизвестная ошибка, повторите позже', icon: 'alert-circle' })
     } finally {
-        closeDIalog();
+        closeDialog();
         emptyFields();
     }
 }
@@ -78,10 +79,11 @@ async function createCat() {
                 name="default_price"
                 label="Цена по умолчанию (не обязательно)"
                 placeholder="1000"
+                type="number"
             />
         </form>
         <template #footer>
-            <UiButton prepend-icon="har-close" text="Отмена" variant="tonal" @click="closeDIalog" />
+            <UiButton prepend-icon="har-close" text="Отмена" variant="tonal" @click="closeDialog" />
             <UiButton type="submit" prepend-icon="har-check" text="Подтвердить" :form="'form-'+id_hash" />
         </template>
     </UiDialog>

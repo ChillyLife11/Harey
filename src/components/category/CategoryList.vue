@@ -1,9 +1,10 @@
 <script setup>
 import { ref, watch } from "vue";
 import draggable from 'vuedraggable';
+import { databases } from "@/appwrite.js";
+import { APPWRITE } from "@/config.js";
 
 import CategoryItem       from "@/components/category/CategoryItem.vue";
-import CategoryDialogAdd  from "@/components/category/CategoryDialogAdd.vue";
 import CategoryDialogEdit from "@/components/category/CategoryDialogEdit.vue";
 
 const $props = defineProps({
@@ -22,11 +23,41 @@ function openDialogEdit(category_id) {
     dialog_edit_state.value = true;
 }
 
-function onChange({ moved }) {
-    console.log(props.moved.newIndex, props.moved.oldIndex, props.moved.element.id);
+async function onChange({ moved }) {
+    const category_id = moved.element.$id;
+
+    local_items.value[moved.newIndex].sort = local_items.value.length - moved.newIndex;
 
     if (moved.newIndex > moved.oldIndex) {
-        const diff = moved.newIndex - moved.oldIndex;
+        for (let a = moved.oldIndex; a < moved.newIndex; a++) {
+            local_items.value[a].sort++;
+        }
+    }
+
+    try {
+        await databases.updateDocument(
+            APPWRITE.DB_ID,
+            APPWRITE.CATEGORIES_ID,
+            category_id,
+            {
+                sort: local_items.value[moved.newIndex].sort
+            }
+        );
+
+        if (moved.newIndex > moved.oldIndex) {
+            for (let a = moved.oldIndex; a < moved.newIndex; a++) {
+                await databases.updateDocument(
+                    APPWRITE.DB_ID,
+                    APPWRITE.CATEGORIES_ID,
+                    local_items.value[a].$id,
+                    {
+                        sort: local_items.value[a].sort
+                    }
+                );
+            }
+        }
+    } catch (e) {
+        console.log(e);
     }
 }
 

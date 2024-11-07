@@ -10,7 +10,7 @@ const $category_store = useCategoryStore();
 const additional_category_menu = ref(false);
 const category_add_dialog      = ref(false);
 
-onMounted(() => $category_store.getList(3));
+onMounted(() => $category_store.getList());
 </script>
 
 <template>
