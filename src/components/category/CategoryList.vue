@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import draggable from 'vuedraggable';
 import { databases } from "@/appwrite.js";
 import { APPWRITE } from "@/config.js";
@@ -24,17 +24,19 @@ function openDialogEdit(category_id) {
 }
 
 async function onChange({ moved }) {
+    console.log(moved);
+
     const category_id = moved.element.$id;
-    const newIndex = moved.newIndex;
-    const oldIndex = moved.oldIndex;
+    const new_index   = moved.newIndex < local_items.value.length ? moved.newIndex : local_items.value.length - 1;
+    const old_index   = moved.oldIndex;
 
-    local_items.value[newIndex].sort = local_items.value.length - newIndex;
+    local_items.value[new_index].sort = local_items.value.length - new_index;
 
-    const isMovingDown = newIndex > oldIndex;
+    const isMovingDown = new_index > old_index;
     const updatePromises = [];
 
-    const start = isMovingDown ? oldIndex : newIndex;
-    const end = isMovingDown ? newIndex : oldIndex;
+    const start = isMovingDown ? old_index : new_index;
+    const end = isMovingDown ? new_index : old_index;
     const step = isMovingDown ? 1 : -1;
 
     for (let i = start; (isMovingDown ? i < end : i > end); i += step) {
@@ -54,7 +56,7 @@ async function onChange({ moved }) {
             APPWRITE.DB_ID,
             APPWRITE.CATEGORIES_ID,
             category_id,
-            { sort: local_items.value[newIndex].sort }
+            { sort: local_items.value[new_index].sort }
         )
     );
 

@@ -32,6 +32,8 @@ export const useCategoryStore = defineStore('category', {
                     ID.unique(),
                     { title, default_price, user_id: $account_store.user.$id, sort: current_max_sort_number + 1 }
                 );
+
+                await this.getList();
             } catch (e) {
                 throw new Error(ERRORS[e.type] || 'Ошибка при добавлении категории');
             }
