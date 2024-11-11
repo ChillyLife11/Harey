@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed } from "vue";
+import { computed, reactive, ref } from "vue";
 
 const $props = defineProps({
     text:        { type: String, },

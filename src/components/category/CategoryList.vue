@@ -1,10 +1,10 @@
 <script setup>
-import { nextTick, ref, watch } from "vue";
-import draggable from 'vuedraggable';
+import { ref, watch } from "vue";
+import draggable from "vuedraggable";
 import { databases } from "@/appwrite.js";
 import { APPWRITE } from "@/config.js";
 
-import CategoryItem       from "@/components/category/CategoryItem.vue";
+import CategoryItem from "@/components/category/CategoryItem.vue";
 import CategoryDialogEdit from "@/components/category/CategoryDialogEdit.vue";
 
 const $props = defineProps({
@@ -14,59 +14,76 @@ const $props = defineProps({
 const local_items = ref([]);
 
 const dialog_edit_state = ref(false);
-const curr_category_id  = ref(null);
+const curr_category_id = ref(null);
 
-watch(() => $props.items, new_items => local_items.value = [...new_items]);
+watch(
+    () => $props.items,
+    (new_items) => {
+        local_items.value = [...new_items];
+        console.log(local_items.value);
+    },
+);
 
 function openDialogEdit(category_id) {
-    curr_category_id .value = category_id;
+    curr_category_id.value = category_id;
     dialog_edit_state.value = true;
 }
 
 async function onChange({ moved }) {
-    console.log(moved);
-
     const category_id = moved.element.$id;
-    const new_index   = moved.newIndex < local_items.value.length ? moved.newIndex : local_items.value.length - 1;
-    const old_index   = moved.oldIndex;
 
-    local_items.value[new_index].sort = local_items.value.length - new_index;
+    const new_index = moved.newIndex < local_items.value.length ? moved.newIndex : moved.newIndex - 1;
+    const old_index = moved.oldIndex;
 
-    const isMovingDown = new_index > old_index;
-    const updatePromises = [];
 
-    const start = isMovingDown ? old_index : new_index;
-    const end = isMovingDown ? new_index : old_index;
-    const step = isMovingDown ? 1 : -1;
+    if (new_index > old_index) {
+        local_items.value[new_index].sort = local_items.value.length - new_index;
 
-    for (let i = start; (isMovingDown ? i < end : i > end); i += step) {
-        local_items.value[i].sort += step;
-        updatePromises.push(
-            databases.updateDocument(
-                APPWRITE.DB_ID,
-                APPWRITE.CATEGORIES_ID,
-                local_items.value[i].$id,
-                { sort: local_items.value[i].sort }
-            )
-        );
+        for (let a = old_index; a < new_index; a++) {
+            local_items.value[a].sort++;
+        }
+    } else {
+        local_items.value[new_index].sort = local_items.value[new_index+1].sort;
+        for (let a = new_index; a < old_index; a++) {
+            local_items.value[a+1].sort--;
+        }
     }
-
-    updatePromises.push(
-        databases.updateDocument(
+    try {
+        await databases.updateDocument(
             APPWRITE.DB_ID,
             APPWRITE.CATEGORIES_ID,
             category_id,
-            { sort: local_items.value[new_index].sort }
-        )
-    );
-
-    try {
-        await Promise.all(updatePromises);
+            {
+                sort: local_items.value[new_index].sort
+            }
+        );
+        if (new_index > old_index) {
+            for (let a = old_index; a < new_index; a++) {
+                await databases.updateDocument(
+                    APPWRITE.DB_ID,
+                    APPWRITE.CATEGORIES_ID,
+                    local_items.value[a].$id,
+                    {
+                        sort: local_items.value[a].sort
+                    }
+                );
+            }
+        } else {
+            for (let a = new_index; a < old_index; a++) {
+                await databases.updateDocument(
+                    APPWRITE.DB_ID,
+                    APPWRITE.CATEGORIES_ID,
+                    local_items.value[a+1].$id,
+                    {
+                        sort: local_items.value[a+1].sort
+                    }
+                );
+            }
+        }
     } catch (e) {
-        console.error('Error updating documents:', e);
+        console.log(e);
     }
 }
-
 </script>
 
 <template>
@@ -84,23 +101,27 @@ async function onChange({ moved }) {
         >
             <template #item="{ element }">
                 <div>
-<!--                    sort: {{ element.sort }}-->
-                    <CategoryItem :id="element.$id" :title="element.title" @open-dialog-edit="openDialogEdit(element.id)" />
+                    <!--                    sort: {{ element.sort }}-->
+                    <CategoryItem
+                        :id="element.$id"
+                        :title="element.title"
+                        @open-dialog-edit="openDialogEdit(element.id)"
+                    />
                 </div>
             </template>
         </draggable>
 
-
-        <CategoryDialogEdit v-model="dialog_edit_state" :id="curr_category_id" />
+        <CategoryDialogEdit
+            v-model="dialog_edit_state"
+            :id="curr_category_id"
+        />
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 8px;
 }
-
 </style>
