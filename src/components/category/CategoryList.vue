@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import draggable from "vuedraggable";
 import { databases } from "@/appwrite.js";
 import { APPWRITE } from "@/config.js";
@@ -14,40 +14,39 @@ const $props = defineProps({
 const local_items = ref([]);
 
 const dialog_edit_state = ref(false);
-const curr_category_id = ref(null);
+const curr_category_id  = ref(null);
 
-watch(
-    () => $props.items,
-    (new_items) => {
-        local_items.value = [...new_items];
-        console.log(local_items.value);
-    },
-);
+watch(() => $props.items, fillItems);
+
+onMounted(fillItems);
 
 function openDialogEdit(category_id) {
-    curr_category_id.value = category_id;
+    curr_category_id .value = category_id;
     dialog_edit_state.value = true;
 }
 
+function fillItems() { local_items.value = [...$props.items]; }
+
 async function onChange({ moved }) {
-    const category_id = moved.element.$id;
+    const category_id    = moved.element.$id;
+    const new_index      = moved.newIndex < local_items.value.length ? moved.newIndex : moved.newIndex - 1;
+    const old_index      = moved.oldIndex;
+    const is_moving_down = new_index > old_index;
 
-    const new_index = moved.newIndex < local_items.value.length ? moved.newIndex : moved.newIndex - 1;
-    const old_index = moved.oldIndex;
-
-
-    if (new_index > old_index) {
-        local_items.value[new_index].sort = local_items.value.length - new_index;
-
-        for (let a = old_index; a < new_index; a++) {
-            local_items.value[a].sort++;
-        }
-    } else {
-        local_items.value[new_index].sort = local_items.value[new_index+1].sort;
-        for (let a = new_index; a < old_index; a++) {
-            local_items.value[a+1].sort--;
+    local_items.value[new_index].sort = is_moving_down
+                                        ? local_items.value.length - new_index
+                                        : local_items.value[new_index+1].sort;
+    for (
+        let a = (is_moving_down ? old_index : new_index);
+            a < (is_moving_down ? new_index : old_index);
+            a++
+    ) {
+        if (is_moving_down) local_items.value[a].sort++;
+        else {
+            if (local_items.value[a+1]) local_items.value[a+1].sort--;
         }
     }
+
     try {
         await databases.updateDocument(
             APPWRITE.DB_ID,
@@ -57,31 +56,23 @@ async function onChange({ moved }) {
                 sort: local_items.value[new_index].sort
             }
         );
-        if (new_index > old_index) {
-            for (let a = old_index; a < new_index; a++) {
-                await databases.updateDocument(
-                    APPWRITE.DB_ID,
-                    APPWRITE.CATEGORIES_ID,
-                    local_items.value[a].$id,
-                    {
-                        sort: local_items.value[a].sort
-                    }
-                );
-            }
-        } else {
-            for (let a = new_index; a < old_index; a++) {
-                await databases.updateDocument(
-                    APPWRITE.DB_ID,
-                    APPWRITE.CATEGORIES_ID,
-                    local_items.value[a+1].$id,
-                    {
-                        sort: local_items.value[a+1].sort
-                    }
-                );
-            }
+
+        for (
+            let a = is_moving_down ? old_index : new_index;
+                a < is_moving_down ? new_index : old_index;
+                a++
+        ) {
+            await databases.updateDocument(
+                APPWRITE.DB_ID,
+                APPWRITE.CATEGORIES_ID,
+                local_items.value[a+1].$id,
+                {
+                    sort: is_moving_down ? local_items.value[a].sort : local_items.value[a+1].sort
+                }
+            );
         }
     } catch (e) {
-        console.log(e);
+
     }
 }
 </script>

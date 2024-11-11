@@ -23,7 +23,7 @@ export const useCategoryStore = defineStore('category', {
             const $account_store = useAccountStore();
 
             // no idea how to make this calculate automatically with appwrite functions 😢
-            const current_max_sort_number = Math.max( ...this.list.map(c=>c.sort) );
+            const current_max_sort_number = this.list.length ? Math.max( ...this.list.map(c=>c.sort) ) : 1;
 
             try {
                 await databases.createDocument(
@@ -47,6 +47,21 @@ export const useCategoryStore = defineStore('category', {
                 );
 
                 await this.getList();
+            } catch (e) {
+                throw new Error(ERRORS[e.type] || 'Ошибка при удалении категории');
+            }
+        },
+        async deleteAll() {
+            try {
+                this.list.map(async category => {
+                    await databases.deleteDocument(
+                        APPWRITE.DB_ID,
+                        APPWRITE.CATEGORIES_ID,
+                        category.$id
+                    );
+                });
+
+                this.list = [];
             } catch (e) {
                 throw new Error(ERRORS[e.type] || 'Ошибка при удалении категории');
             }
